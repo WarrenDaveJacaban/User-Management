@@ -8,20 +8,17 @@ const isNetlify = hostname.includes('netlify.app');
 // Define the backend endpoints
 const LOCAL_API = 'http://localhost:4000/accounts';
 const RENDER_API = 'https://user-management-q29q.onrender.com/accounts';
-const VERCEL_API = 'https://user-management-eight-kappa.vercel.app/accounts';
+// Never use Vercel as API endpoint - the backend is only on Render
+// const VERCEL_API = 'https://user-management-eight-kappa.vercel.app/accounts';
 const DEFAULT_REMOTE_API = RENDER_API; // Default for other hosting platforms
 
 // This will automatically choose the correct API endpoint based on where the frontend is running
 export const environment = {
     production: false,
-    // Local development uses localhost API, otherwise use the appropriate deployed API
+    // Local development uses localhost API, otherwise use Render API
     apiUrl: isLocalhost 
         ? LOCAL_API 
-        : isRender 
-            ? RENDER_API
-            : isVercel
-                ? VERCEL_API
-                : DEFAULT_REMOTE_API,
+        : RENDER_API, // Always use Render API for production deployments
     // For debugging - shows which environment was detected
     detectedEnvironment: isLocalhost 
         ? 'Local' 

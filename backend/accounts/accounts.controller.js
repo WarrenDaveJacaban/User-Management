@@ -9,6 +9,7 @@ const db = require('../_helpers/db');
 
 // routes
 router.get('/connection-test', connectionTest);
+router.get('/public-test', publicTest);
 router.post('/authenticate', authenticateSchema, authenticate);
 router.post('/refresh-token', refreshToken);
 router.post('/revoke-token', authorize(), revokeTokenSchema, revokeToken);
@@ -360,6 +361,25 @@ function connectionTest(req, res, next) {
         serverInfo: {
             version: process.version,
             platform: process.platform
+        }
+    });
+}
+
+function publicTest(req, res, next) {
+    // Return basic information about the server without requiring authentication
+    const clientIp = req.ip || req.connection.remoteAddress;
+    const origin = req.get('origin') || 'Unknown';
+    
+    res.json({
+        success: true,
+        message: 'Backend is accessible',
+        serverTime: new Date().toISOString(),
+        clientIp: clientIp,
+        clientOrigin: origin,
+        environment: process.env.NODE_ENV || 'development',
+        cors: {
+            originReceived: req.headers.origin,
+            originAllowed: req.headers.origin ? 'Yes' : 'Unknown'
         }
     });
 }
