@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AccountService } from '../../_services';
-import { SocketService } from '../../_services/socket.service';
 import { first } from 'rxjs/operators';
 import { Account } from '../../_models';
 import { Subscription } from 'rxjs';
@@ -12,40 +11,31 @@ import { Subscription } from 'rxjs';
 export class UsersOnlineComponent implements OnInit, OnDestroy {
     accounts: Account[] = [];
     loading = true;
-    socketSubscription: Subscription;
-    statusUpdatesSubscription: Subscription;
+    subscriptions: Subscription[] = [];
     currentPage = 1;
     itemsPerPage = 5;
     totalPages = 1;
     Math = Math; // Make Math available in template
     
     constructor(
-        private accountService: AccountService,
-        private socketService: SocketService
+        private accountService: AccountService
     ) {}
     
     ngOnInit() {
         this.loadAccounts();
-        this.setupSocketListeners();
     }
     
     ngOnDestroy() {
-        if (this.socketSubscription) {
-            this.socketSubscription.unsubscribe();
-        }
-        
-        if (this.statusUpdatesSubscription) {
-            this.statusUpdatesSubscription.unsubscribe();
-        }
+        this.subscriptions.forEach(sub => sub.unsubscribe());
     }
     
     private loadAccounts() {
         this.loading = true;
-        this.accountService.getAll()
+        const sub = this.accountService.getAll()
             .pipe(first())
             .subscribe({
                 next: accounts => {
-                    // Sort accounts to show online users first
+                    // Sort accounts by online status
                     this.accounts = accounts.sort((a, b) => {
                         if (a.isOnline && !b.isOnline) return -1;
                         if (!a.isOnline && b.isOnline) return 1;
@@ -59,22 +49,8 @@ export class UsersOnlineComponent implements OnInit, OnDestroy {
                     this.loading = false;
                 }
             });
-    }
-    
-    private setupSocketListeners() {
-        // Listen for user status updates
-        this.socketSubscription = this.socketService.getUserStatusUpdates().subscribe(update => {
-            const account = this.accounts.find(a => a.id === update.userId);
-            if (account) {
-                account.isOnline = update.isOnline;
-                // Re-sort accounts to maintain online users first
-                this.accounts.sort((a, b) => {
-                    if (a.isOnline && !b.isOnline) return -1;
-                    if (!a.isOnline && b.isOnline) return 1;
-                    return 0;
-                });
-            }
-        });
+        
+        this.subscriptions.push(sub);
     }
     
     get paginatedAccounts() {

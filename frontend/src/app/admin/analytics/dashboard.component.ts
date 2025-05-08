@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { AccountService } from '../../_services';
-import { SocketService } from '../../_services/socket.service';
 import { first } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -25,32 +24,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     
     loading = true;
     
-    // For real-time updates
+    // For chart updates
     usersChart: any;
     tokensChart: any;
     private subscriptions: Subscription[] = [];
     
     constructor(
-        private accountService: AccountService,
-        private socketService: SocketService
+        private accountService: AccountService
     ) {}
     
     ngOnInit() {
         this.loadStats();
-        
-        // Connect to "socket"
-        this.socketService.connect();
-        
-        // Subscribe to real-time updates
-        this.subscriptions.push(
-            this.socketService.getOnlineUsers().subscribe(users => {
-                if (users.length > 0) {
-                    this.onlineUsers = users.filter(u => u.isOnline).length;
-                    // Update the chart if it exists
-                    this.updateCharts();
-                }
-            })
-        );
     }
     
     ngAfterViewInit() {
@@ -58,9 +42,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     
     ngOnDestroy() {
-        // Disconnect socket
-        this.socketService.disconnect();
-        
         // Unsubscribe from all subscriptions
         this.subscriptions.forEach(sub => sub.unsubscribe());
     }
@@ -75,19 +56,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.verifiedUsers = stats.verifiedUsers;
                 this.refreshTokens = stats.refreshTokenCount;
                 this.monthlyRegistrations = stats.monthlyData;
-                
-                // Initialize socket service with user data
-                this.accountService.getOnlineUsers()
-                    .pipe(first())
-                    .subscribe(users => {
-                        this.socketService.updateOnlineUsers(users);
-                        
-                        // Update registration stats in socket service
-                        this.socketService.updateRegistrationStats({
-                            monthlyData: this.monthlyRegistrations,
-                            totalRegistrations: this.totalUsers
-                        });
-                    });
                 
                 this.loading = false;
                 
@@ -211,8 +179,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     
     updateCharts() {
+        if (this.usersChart) {
+            this.usersChart.update();
+        }
+        
         if (this.tokensChart) {
-            // Update the active sessions data
             this.tokensChart.data.datasets[0].data = [this.refreshTokens, this.totalUsers - this.refreshTokens];
             this.tokensChart.update();
         }
