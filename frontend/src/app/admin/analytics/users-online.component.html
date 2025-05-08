@@ -1,0 +1,129 @@
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Users Online Status</h5>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="loading" class="d-flex justify-content-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div *ngIf="!loading">
+                        <!-- Summary Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card bg-white border border-success shadow-sm">
+                                    <div class="card-body text-center py-4">
+                                        <div class="h2 mb-0 text-dark">{{ getOnlineUsersCount() }}</div>
+                                        <div class="d-flex align-items-center justify-content-center mt-2 p-1">
+                                            <div class="online-status-wrapper me-2">
+                                                <span class="online-indicator"></span>
+                                            </div>
+                                            <span class="text-dark fw-medium">Online Users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-white border border-secondary shadow-sm">
+                                    <div class="card-body text-center py-4">
+                                        <div class="h2 mb-0 text-dark">{{ getOfflineUsersCount() }}</div>
+                                        <div class="d-flex align-items-center justify-content-center mt-2 p-1">
+                                            <i class="fas fa-circle text-secondary me-2"></i>
+                                            <span class="text-dark fw-medium">Offline Users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-white border border-primary shadow-sm">
+                                    <div class="card-body text-center py-4">
+                                        <div class="h2 mb-0 text-dark">{{ getTotalUsersCount() }}</div>
+                                        <div class="d-flex align-items-center justify-content-center mt-2 p-1">
+                                            <i class="fas fa-users text-primary me-2"></i>
+                                            <span class="text-dark fw-medium">Total Users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Last Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let account of paginatedAccounts">
+                                        <td>
+                                            <span class="d-inline-block position-relative me-2 p-1" 
+                                                  [ngClass]="{'text-success': account.isOnline, 'text-secondary': !account.isOnline}">
+                                                <i class="fas fa-circle"></i>
+                                                <span class="position-absolute top-0 start-100 translate-middle" *ngIf="account.isOnline">
+                                                    <span class="badge bg-success rounded-pill">
+                                                        <i class="fas fa-wifi"></i>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                            <span class="ms-1 fw-medium" [ngClass]="{'text-success': account.isOnline, 'text-secondary': !account.isOnline}">
+                                                {{ account.isOnline ? 'Online' : 'Offline' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle bg-primary text-white me-2">
+                                                    {{ account.firstName.charAt(0) }}{{ account.lastName.charAt(0) }}
+                                                </div>
+                                                {{ account.title }} {{ account.firstName }} {{ account.lastName }}
+                                            </div>
+                                        </td>
+                                        <td>{{ account.email }}</td>
+                                        <td>
+                                            <span class="badge" 
+                                                [ngClass]="{'bg-danger': isAdminRole(account.role), 'bg-primary': isUserRole(account.role)}">
+                                                {{ account.role }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                {{ account.lastActive ? (account.lastActive | date:'medium') : 'Never' }}
+                                            </div>
+                                            <small class="text-muted" *ngIf="account.lastActive">
+                                                {{ account.isOnline ? 'Currently active' : 'Last seen: ' + (account.lastActive | date:'shortTime') }}
+                                            </small>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <div class="text-muted">
+                                Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, accounts.length) }} of {{ accounts.length }} users
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary" [disabled]="currentPage === 1" (click)="previousPage()">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </button>
+                                <button class="btn btn-outline-primary" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,48 @@
+{
+  "development": {
+    "database": {
+      "url": "postgresql://postgres:FLHsOkowJnuFVNAaCqVeKPDutmDgymJs@trolley.proxy.rlwy.net:20504/railway"
+    },
+    "secret": "STARTTLS_DEV_SECRET",
+    "emailFrom": "serenityq143@gmail.com",
+    "smtpOptions": {
+      "host": "smtp.gmail.com",
+      "port": 465,
+      "secure": true,
+      "auth": {
+        "user": "serenityq143@gmail.com",
+        "pass": "iunf ocqt qloy njfi"
+      },
+      "tls": {
+        "rejectUnauthorized": false
+      },
+      "debug": true,
+      "logger": true,
+      "disableFileAccess": true,
+      "disableUrlAccess": true
+    }
+  },
+  "production": {
+    "database": {
+      "url": "postgresql://postgres:FLHsOkowJnuFVNAaCqVeKPDutmDgymJs@trolley.proxy.rlwy.net:20504/railway"
+    },
+    "secret": "STARTTLS",
+    "emailFrom": "serenityq143@gmail.com",
+    "smtpOptions": {
+      "host": "smtp.gmail.com",
+      "port": 465,
+      "secure": true,
+      "auth": {
+        "user": "serenityq143@gmail.com",
+        "pass": "iunf ocqt qloy njfi"
+      },
+      "tls": {
+        "rejectUnauthorized": false
+      },
+      "debug": true,
+      "logger": true,
+      "disableFileAccess": true,
+      "disableUrlAccess": true
+    }
+  }
+}
