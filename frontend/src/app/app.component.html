@@ -7,6 +7,10 @@
         <a class="nav-item nav-link" routerLink="/admin" routerLinkActive="active" *ngIf="account?.role === Role.Admin">Admin</a>
         <button class="btn btn-link nav-item nav-link" (click)="logout()">Logout</button>
       </div>
+      <!-- Environment indicator visible only during development -->
+      <div class="ms-auto" *ngIf="!isProduction">
+        <span class="badge bg-info text-white">{{detectedEnv}} API</span>
+      </div>
     </nav>
   
     <!-- subnav router outlet -->

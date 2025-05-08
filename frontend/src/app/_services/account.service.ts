@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, catchError, throwError, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, throwError, switchMap, tap, of } from 'rxjs';
 import { map, finalize } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
@@ -419,5 +419,53 @@ export class AccountService {
         }
       });
     }
+  }
+
+  // Add this method after the testConnection method
+  public getConnectionInfo(): Observable<any> {
+    console.log(`Checking connection to: ${baseUrl}`);
+    
+    return this.http.get<any>(`${baseUrl}/connection-test`, { 
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      }),
+      withCredentials: true 
+    }).pipe(
+      map(response => {
+        return {
+          status: 'success',
+          endpoint: baseUrl,
+          environment: environment.detectedEnvironment,
+          response: response
+        };
+      }),
+      catchError(error => {
+        return of({
+          status: 'error',
+          endpoint: baseUrl,
+          environment: environment.detectedEnvironment,
+          error: error.message || 'Connection failed'
+        });
+      })
+    );
+  }
+
+  // Add this method to check the current deployment
+  public getDeploymentInfo(): any {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    const fullUrl = window.location.href;
+    const apiEndpoint = environment.apiUrl;
+    
+    return {
+      currentUrl: fullUrl,
+      hostname: hostname,
+      protocol: protocol,
+      isVercel: hostname.includes('vercel.app'),
+      isRender: hostname.includes('render.com'),
+      isLocalhost: hostname === 'localhost' || hostname === '127.0.0.1',
+      apiEndpoint: apiEndpoint,
+      environment: environment.detectedEnvironment
+    };
   }
 }

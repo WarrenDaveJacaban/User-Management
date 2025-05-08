@@ -338,7 +338,7 @@ function basicDetails(account) {
 async function sendVerificationEmail(account, origin) {
     let message;
     // Default verification URL base
-    const baseUrl = origin || 'https://user-management-system-angular-tm8z.vercel.app';
+    const baseUrl = origin || 'https://user-management-eight-kappa.vercel.app';
     
     // Check which origin to use
     let verifyUrl;
@@ -350,7 +350,7 @@ async function sendVerificationEmail(account, origin) {
         verifyUrl = `${process.env.FRONTEND_URL}/account/verify-email?token=${account.verificationToken}`;
     } else {
         // Use default Vercel URL
-        verifyUrl = `https://user-management-system-angular-tm8z.vercel.app/account/verify-email?token=${account.verificationToken}`;
+        verifyUrl = `https://user-management-eight-kappa.vercel.app/account/verify-email?token=${account.verificationToken}`;
     }
     
     message = `
@@ -397,7 +397,7 @@ async function sendAlreadyRegisteredEmail(email, origin) {
         forgotPasswordUrl = `${process.env.FRONTEND_URL}/account/forgot-password`;
     } else {
         // Use default Vercel URL
-        forgotPasswordUrl = `https://user-management-system-angular-tm8z.vercel.app/account/forgot-password`;
+        forgotPasswordUrl = `https://user-management-eight-kappa.vercel.app/account/forgot-password`;
     }
     
     message = `
@@ -444,7 +444,7 @@ async function sendPasswordResetEmail(account, origin) {
         resetUrl = `${process.env.FRONTEND_URL}/account/reset-password?token=${account.resetToken}`;
     } else {
         // Use default Vercel URL
-        resetUrl = `https://user-management-system-angular-tm8z.vercel.app/account/reset-password?token=${account.resetToken}`;
+        resetUrl = `https://user-management-eight-kappa.vercel.app/account/reset-password?token=${account.resetToken}`;
     }
     
     message = `

@@ -8,6 +8,7 @@ const accountService = require('./account.service');
 const db = require('../_helpers/db');
 
 // routes
+router.get('/connection-test', connectionTest);
 router.post('/authenticate', authenticateSchema, authenticate);
 router.post('/refresh-token', refreshToken);
 router.post('/revoke-token', authorize(), revokeTokenSchema, revokeToken);
@@ -342,4 +343,23 @@ function clearInactiveTokens(req, res, next) {
         res.json({ message: `${count} inactive tokens cleared` });
     })
     .catch(next);
+}
+
+function connectionTest(req, res, next) {
+    // Return basic information about the server
+    const clientIp = req.ip || req.connection.remoteAddress;
+    const serverTime = new Date().toISOString();
+    const origin = req.get('origin') || 'Unknown';
+    
+    res.json({
+        message: 'Connection successful',
+        serverTime: serverTime,
+        clientIp: clientIp,
+        clientOrigin: origin,
+        environment: process.env.NODE_ENV || 'development',
+        serverInfo: {
+            version: process.version,
+            platform: process.platform
+        }
+    });
 }
