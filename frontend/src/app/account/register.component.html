@@ -4,31 +4,6 @@
             <p class="text-muted">Fill in your information to get started</p>
         </div>
 
-        <!-- API Connection Status Card -->
-        <div class="alert" [ngClass]="{'alert-success': apiInfo.isConnected, 'alert-danger': !apiInfo.isConnected && !testingConnection, 'alert-info': testingConnection}">
-            <div class="d-flex align-items-center">
-                <div *ngIf="testingConnection" class="spinner-border spinner-border-sm mr-2"></div>
-                <div *ngIf="!testingConnection && !apiInfo.isConnected" class="mr-2">
-                    <i class="fa fa-exclamation-triangle"></i>
-                </div>
-                <div *ngIf="!testingConnection && apiInfo.isConnected" class="mr-2">
-                    <i class="fa fa-check-circle"></i>
-                </div>
-                <div>
-                    <strong>API Connection: </strong> {{ apiInfo.message }}
-                    <div *ngIf="!apiInfo.isConnected && !testingConnection" class="mt-2">
-                        <button (click)="testApiConnection()" class="btn btn-sm btn-outline-light">
-                            <span *ngIf="testingConnection" class="spinner-border spinner-border-sm mr-1"></span>
-                            Retry
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="apiInfo.environment !== 'Local'" class="mt-2 small">
-                <strong>Environment:</strong> {{ apiInfo.environment }} | 
-                <strong>API URL:</strong> {{ apiInfo.url }}
-            </div>
-        </div>
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="row">
