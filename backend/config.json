@@ -1,17 +1,17 @@
 {
   "development": {
     "database": {
-      "url": "postgresql://postgres:vyjOzljPiAKCLybzurgDYfnaZhWEuAfT@tramway.proxy.rlwy.net:45822/railway"
+      "url": "postgresql://postgres:AFRPOsKbABljFScFqHiLFqhPQMAbiEgS@tramway.proxy.rlwy.net:54355/railway"
     },
     "secret": "STARTTLS_DEV_SECRET",
-    "emailFrom": "serenityq143@gmail.com",
+    "emailFrom": "huntersungjinwoo321@gmail.com",
     "smtpOptions": {
       "host": "smtp.gmail.com",
       "port": 465,
       "secure": true,
       "auth": {
         "user": "serenityq143@gmail.com",
-        "pass": "iunf ocqt qloy njfi"
+        "pass": "zcwd brtd qpha tebq"
       },
       "tls": {
         "rejectUnauthorized": false
@@ -24,17 +24,17 @@
   },
   "production": {
     "database": {
-      "url": "postgresql://postgres:vyjOzljPiAKCLybzurgDYfnaZhWEuAfT@tramway.proxy.rlwy.net:45822/railway"
+      "url": "postgresql://postgres:AFRPOsKbABljFScFqHiLFqhPQMAbiEgS@tramway.proxy.rlwy.net:54355/railway"
     },
     "secret": "STARTTLS",
-    "emailFrom": "serenityq143@gmail.com",
+    "emailFrom": "huntersungjinwoo321@gmail.com",
     "smtpOptions": {
       "host": "smtp.gmail.com",
       "port": 465,
       "secure": true,
       "auth": {
         "user": "serenityq143@gmail.com",
-        "pass": "iunf ocqt qloy njfi"
+        "pass": "zcwd brtd qpha tebq"
       },
       "tls": {
         "rejectUnauthorized": false
