@@ -8,13 +8,13 @@ Angular CLI
 Installation
 Clone the Repository
 
-git clone https://github.com/Froillan123/User-Management-System-Angular.git
+git clone https://github.com/WarrenDaveJacaban/User-Management
 cd User-Management-System-Angular
 Backend Setup
 
 cd backend
 npm install
-Create config.json:
+# Create config.json:
 
 {
   "database": {
@@ -36,7 +36,7 @@ Frontend Setup
 
 cd frontend
 npm install
-⚙️ Configuration
+# Configuration
 Environment Setup
 Copy the example environment file:
 cp backend/.env.example backend/.env
@@ -55,7 +55,7 @@ Security Notes
 Keep your JWT secret key secure and unique
 Regularly rotate your email app password
 Use strong database passwords
-📚 API Documentation
+# API Documentation
 API documentation is available at /api-docs when the backend server is running. Key endpoints:
 
 Method	Endpoint	Description
@@ -65,7 +65,7 @@ POST	/accounts/verify-email	Verify email
 POST	/accounts/forgot-password	Request password reset
 GET	/accounts	Get all accounts (Admin)
 PUT	/accounts/:id	Update account
-🌐 Deployment
+# Deployment
 Backend Deployment (Render)
 Create a new Web Service
 Connect your repository
