@@ -45,7 +45,7 @@
    npm install
    ```
 
-## ⚙️ Configuration
+##  Configuration
 
 ### Environment Setup
 1. Copy the example environment file:
@@ -73,7 +73,7 @@
 - Regularly rotate your email app password
 - Use strong database passwords
 
-## 📚 API Documentation
+##  API Documentation
 
 API documentation is available at `/api-docs` when the backend server is running. Key endpoints:
 
@@ -86,7 +86,7 @@ API documentation is available at `/api-docs` when the backend server is running
 | GET | /accounts | Get all accounts (Admin) |
 | PUT | /accounts/:id | Update account |
 
-## 🌐 Deployment
+##  Deployment
 
 ### Backend Deployment (Render)
 1. Create a new Web Service
