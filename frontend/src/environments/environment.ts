@@ -1,3 +1,4 @@
+// frontend/src/environments/environment.ts
 // Dynamic environment configuration based on hostname
 const hostname = window.location.hostname;
 const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
@@ -7,7 +8,7 @@ const isNetlify = hostname.includes('netlify.app');
 
 // Define the backend endpoints
 const LOCAL_API = 'http://localhost:4000/accounts';
-const RENDER_API = 'https://user-management-q29q.onrender.com/accounts';
+const RENDER_API = 'https://user-management-system-angular.onrender.com/accounts';
 // Never use Vercel as API endpoint - the backend is only on Render
 // const VERCEL_API = 'https://user-management-eight-kappa.vercel.app/accounts';
 const DEFAULT_REMOTE_API = RENDER_API; // Default for other hosting platforms
@@ -19,6 +20,14 @@ export const environment = {
     apiUrl: isLocalhost 
         ? LOCAL_API 
         : RENDER_API, // Always use Render API for production deployments
+    // Domain for cookies - important for cross-domain cookie handling
+    cookieDomain: isLocalhost 
+        ? undefined 
+        : isVercel 
+            ? '.vercel.app'
+            : isRender
+                ? '.render.com'
+                : null,
     // For debugging - shows which environment was detected
     detectedEnvironment: isLocalhost 
         ? 'Local' 
@@ -28,4 +37,3 @@ export const environment = {
                 ? 'Vercel' 
                 : 'Other'
 };
-

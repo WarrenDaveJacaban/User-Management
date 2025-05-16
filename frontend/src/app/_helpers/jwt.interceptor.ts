@@ -1,3 +1,4 @@
+// frontend/src/app/_helpers/jwt.interceptor.ts
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
@@ -18,11 +19,13 @@ export class JwtInterceptor implements HttpInterceptor {
     const account = this.accountService.accountValue;
     const isLoggedIn = account?.jwtToken;
     
-    // Check if request is to any of our API endpoints
-    const isApiUrl = request.url.includes(environment.apiUrl) || 
-                    request.url.includes('user-management-system-angular.onrender.com') ||
-                    request.url.includes('user-management-system-angular-tm8z.vercel.app') ||
-                    request.url.includes('localhost:4000');
+    // Check if request is to any API endpoint by checking if the URL contains 
+    // any of the relevant backend paths
+    const isApiUrl = request.url.includes('/accounts') || 
+                     request.url.includes('/departments') || 
+                     request.url.includes('/employees') || 
+                     request.url.includes('/workflows') ||
+                     request.url.includes(environment.apiUrl.replace('/accounts', ''));
                     
     const isRefreshTokenRequest = request.url.includes('/refresh-token');
     const isRevokeTokenRequest = request.url.includes('/revoke-token');
@@ -122,7 +125,6 @@ export class JwtInterceptor implements HttpInterceptor {
 
   private addTokenHeader(request: HttpRequest<any>, token: string) {
     console.log(`Adding refreshed token to request: ${request.method} ${request.url}`);
-    console.log(`New JWT token: ${token.substring(0, 20)}...`);
     
     return request.clone({
       setHeaders: {
