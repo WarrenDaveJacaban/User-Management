@@ -2,8 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { first } from 'rxjs/operators';
 
-import { EmployeeService, AlertService } from '@app/_services';
-import { Employee } from '@app/_models';
+import { EmployeeService, AlertService } from '../../_services';
+import { Employee } from '../../_models';
 
 @Component({ templateUrl: 'list.component.html' })
 export class ListComponent implements OnInit {

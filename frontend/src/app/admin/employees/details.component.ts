@@ -4,8 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
-import { EmployeeService, WorkflowService, AlertService } from '@app/_services';
-import { Employee, Workflow } from '@app/_models';
+import { EmployeeService, WorkflowService, AlertService } from '../../_services';
+import { Employee, Workflow } from '../../_models';
 
 @Component({ templateUrl: 'details.component.html' })
 export class DetailsComponent implements OnInit {
@@ -105,10 +105,12 @@ export class DetailsComponent implements OnInit {
         }
         
         // Update the workflow
-        if (workflow.status !== newStatus) {
-            this.workflowService.update(workflow.id.toString(), { 
-                status: newStatus 
-            })
+        if (workflow.status !== newStatus && workflow.id !== undefined && workflow.id !== null) {
+            const updatedWorkflow: Workflow = {
+                ...workflow,
+                status: newStatus
+            };
+            this.workflowService.update(workflow.id.toString(), updatedWorkflow)
             .pipe(first())
             .subscribe({
                 next: () => {

@@ -5,9 +5,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first, finalize } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
-import { EmployeeService, AccountService, DepartmentService, AlertService } from '@app/_services';
-import { Account, Department } from '@app/_models';
-
+import { EmployeeService, AccountService, DepartmentService, AlertService } from '../../_services';
+import { Account, Department } from '../../_models';
 @Component({ templateUrl: 'add-edit.component.html' })
 export class AddEditComponent implements OnInit {
     form: FormGroup;
@@ -50,23 +49,30 @@ export class AddEditComponent implements OnInit {
                 this.form = this.formBuilder.group({
                     employeeId: [''],
                     position: ['', Validators.required],
-                    hireDate: [new Date().toISOString().substring(0, 10), Validators.required],
+                    hireDate: [new Date().toISOString().substring(0, 10), [Validators.required]], // string format 'YYYY-MM-DD'
                     status: ['Active', Validators.required],
                     departmentId: ['', Validators.required],
                     accountId: ['', Validators.required]
-                });
+                } as { [key: string]: any }); // Explicitly allow string values
                 
                 if (!this.isAddMode) {
                     this.employeeService.getById(this.id)
                         .pipe(first())
                         .subscribe(employee => {
                             // Format the date for the form
+                            let patchEmployee = { ...employee };
                             if (employee.hireDate) {
                                 const hireDate = new Date(employee.hireDate);
-                                employee.hireDate = hireDate.toISOString().substring(0, 10);
+                                // Patch only the form control with the string, don't mutate the object type
+                                this.form.patchValue({
+                                    ...patchEmployee,
+                                    hireDate: hireDate.toISOString().substring(0, 10) // string for form control
+                                });
+                            } else {
+                                this.form.patchValue({
+                                    ...patchEmployee
+                                });
                             }
-                            
-                            this.form.patchValue(employee);
                         });
                 }
             },
