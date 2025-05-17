@@ -1,3 +1,4 @@
+// Updated backend/server.js
 require('rootpath')();
 require('dotenv').config();
 const express = require('express');
@@ -72,10 +73,23 @@ app.options('*', (req, res) => {
 
 // API routes - wrap in try/catch to isolate errors
 try {
-    console.log('Loading accounts controller...');
+    console.log('Loading controllers...');
+    
+    // Original controllers
     const accountsController = require('./accounts/accounts.controller');
     app.use('/accounts', accountsController);
-    console.log('Accounts controller loaded successfully');
+    
+    // New controllers
+    const departmentsController = require('./departments/departments.controller');
+    app.use('/departments', departmentsController);
+    
+    const employeesController = require('./employees/employees.controller');
+    app.use('/employees', employeesController);
+    
+    const workflowsController = require('./workflows/workflows.controller');
+    app.use('/workflows', workflowsController);
+    
+    console.log('Controllers loaded successfully');
 } catch (error) {
     console.error('Error loading controllers:', error);
     process.exit(1);
