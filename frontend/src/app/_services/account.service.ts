@@ -36,6 +36,37 @@ export class AccountService {
   public get accountValue(): Account | null {
     return this.accountSubject.value;
   }
+// More defensive version of logout that protects against production optimization issues
+
+  // Protected method to handle the core logout logic
+  protected performLogoutActions(): void {
+    try {
+      if (this.refreshTokenTimeout) {
+        clearTimeout(this.refreshTokenTimeout);
+        this.refreshTokenTimeout = null;
+      }
+      
+      this.accountSubject.next(null);
+      
+      localStorage.removeItem('account');
+      localStorage.removeItem('refreshToken');
+      
+      // Clear any potential cookies
+      document.cookie = 'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      
+      // If deployed on a specific domain
+      const domain = window.location.hostname;
+      if (domain.includes('vercel.app')) {
+        document.cookie = `refreshToken=; Path=/; Domain=.vercel.app; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      }
+      
+      this.router.navigate(['/account/login']);
+    } catch (error) {
+      console.error('Error in performLogoutActions:', error);
+      // Last resort fallback - use direct navigation
+      window.location.href = '/account/login';
+    }
+  }
 
   private getHttpOptions() {
     const account = this.accountValue;
