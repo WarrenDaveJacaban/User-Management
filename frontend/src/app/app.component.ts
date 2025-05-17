@@ -1,4 +1,7 @@
+// frontend/src/app/app.component.ts (updated)
 import { Component, OnInit } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AccountService } from './_services';
 import { Account, Role } from './_models';
 import { environment } from '../environments/environment';
@@ -14,9 +17,20 @@ export class AppComponent implements OnInit {
   apiEndpoint = environment.apiUrl;
   detectedEnv = environment.detectedEnvironment;
   isProduction = environment.production;
+  isAdminRoute = false;
 
-  constructor(private accountService: AccountService) {
+  constructor(
+    private router: Router,
+    private accountService: AccountService
+  ) {
     this.accountService.account.subscribe(x => this.account = x);
+    
+    // Track route changes to determine admin routes
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.isAdminRoute = event.url.includes('/admin');
+    });
   }
 
   ngOnInit() {
