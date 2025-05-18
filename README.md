@@ -5,6 +5,11 @@
 - npm or yarn
 - Angular CLI
 
+## Postgres -- Railway
+psql -h tramway.proxy.rlwy.net -U postgres -p 45822 -d railway
+
+Password=vyjOzljPiAKCLybzurgDYfnaZhWEuAfT
+
 ### Installation
 
 1. **Clone the Repository**
