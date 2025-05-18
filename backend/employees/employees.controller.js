@@ -13,11 +13,19 @@ router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
 router.put('/:id', authorize(Role.Admin), updateSchema, update);
 router.delete('/:id', authorize(Role.Admin), _delete);
+router.post('/:id/transfer', authorize(Role.Admin), transferSchema, transferEmployee);
 
 module.exports = router;
 
 // route functions
-
+function transferEmployee(req, res, next) {
+    // Get current user (admin) ID from JWT token
+    const userId = req.auth.id;
+    
+    employeeService.transferEmployee(req.params.id, req.body.departmentId, userId)
+        .then(result => res.json(result))
+        .catch(next);
+}
 function getAll(req, res, next) {
     employeeService.getAll()
         .then(employees => res.json(employees))
@@ -49,7 +57,12 @@ function _delete(req, res, next) {
 }
 
 // schema functions
-
+function transferSchema(req, res, next) {
+    const schema = Joi.object({
+        departmentId: Joi.number().required()
+    });
+    validateRequest(req, next, schema);
+}
 function createSchema(req, res, next) {
     const schema = Joi.object({
         employeeId: Joi.string().empty(''),

@@ -1,0 +1,87 @@
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-0" *ngIf="employee">Transfer Employee: {{ employee.employeeId }}</h1>
+            <p class="text-muted">Transfer employee to a different department</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a [routerLink]="['../../details', id]" class="btn btn-light">
+                <i class="fas fa-arrow-left me-1"></i> Back to Employee
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="text-center p-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 mb-0">Loading data...</p>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+    </div>
+
+    <div *ngIf="employee && !loading">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Department Transfer</h5>
+            </div>
+            <div class="card-body">
+                <!-- Employee info summary -->
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-info-circle fa-2x"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1"><strong>Current Employee:</strong> {{ employee.accountName }}</p>
+                            <p class="mb-1"><strong>Position:</strong> {{ employee.position }}</p>
+                            <p class="mb-0"><strong>Current Department:</strong> {{ employee.departmentName }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transfer form -->
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <div class="mb-4">
+                        <label class="form-label">Select New Department</label>
+                        <select formControlName="departmentId" class="form-select" 
+                                [ngClass]="{ 'is-invalid': f.departmentId.errors && f.departmentId.touched }">
+                            <option value="">-- Select Department --</option>
+                            <option *ngFor="let department of departments" [value]="department.id">
+                                {{ department.name }}
+                            </option>
+                        </select>
+                        <div *ngIf="f.departmentId.errors && f.departmentId.touched" class="invalid-feedback">
+                            <div *ngIf="f.departmentId.errors.required">New department is required</div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0">Transferring an employee will create a workflow to track the transfer process. The initial status will be <strong>Pending</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a [routerLink]="['../../details', id]" class="btn btn-light">
+                            <i class="fas fa-times me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" [disabled]="submitting || !form.valid">
+                            <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+                            <i *ngIf="!submitting" class="fas fa-exchange-alt me-1"></i> Transfer Employee
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

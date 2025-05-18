@@ -3,13 +3,74 @@ const db = require('../_helpers/db');
 const { Op } = require('sequelize');
 
 module.exports = {
+    // existing methods...
     getAll,
     getById,
     create,
     update,
     delete: _delete,
-    generateEmployeeId
+    generateEmployeeId,
+    // new method for employee transfer
+    transferEmployee
 };
+
+// New function for employee transfer
+async function transferEmployee(employeeId, newDepartmentId, userId) {
+    // Validate employee
+    const employee = await db.Employee.findByPk(employeeId, {
+        include: [
+            { model: db.Department, attributes: ['name'] },
+            { model: db.Account, attributes: ['firstName', 'lastName'] }
+        ]
+    });
+    
+    if (!employee) {
+        throw 'Employee not found';
+    }
+    
+    // Validate department
+    const newDepartment = await db.Department.findByPk(newDepartmentId);
+    if (!newDepartment) {
+        throw 'Department not found';
+    }
+    
+    // Check if it's actually a transfer (not the same department)
+    if (employee.departmentId === parseInt(newDepartmentId)) {
+        throw 'Employee is already in this department';
+    }
+    
+    // Store old department info for workflow description
+    const oldDepartmentName = employee.department ? employee.department.name : 'Unknown';
+    const newDepartmentName = newDepartment.name;
+    const employeeName = employee.account ? 
+        `${employee.account.firstName} ${employee.account.lastName}` : 
+        `Employee ${employee.employeeId}`;
+    
+    // Create workflow for the transfer
+    const workflow = new db.Workflow({
+        type: 'Department Transfer',
+        status: 'Pending',
+        description: `Transfer ${employeeName} from ${oldDepartmentName} to ${newDepartmentName}`,
+        employeeId: employeeId,
+        assignedTo: userId
+    });
+    
+    // Update employee's department
+    employee.departmentId = newDepartmentId;
+    employee.updated = new Date();
+    
+    // Save both changes
+    await db.sequelize.transaction(async (t) => {
+        await employee.save({ transaction: t });
+        await workflow.save({ transaction: t });
+    });
+    
+    return { 
+        employee, 
+        workflow,
+        message: `Employee transferred from ${oldDepartmentName} to ${newDepartmentName}` 
+    };
+}
 
 async function getAll() {
     const employees = await db.Employee.findAll({

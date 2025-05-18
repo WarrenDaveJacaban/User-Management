@@ -1,4 +1,4 @@
-// frontend/src/app/admin/employees/employees.module.ts
+// Update for frontend/src/app/admin/employees/employees.module.ts
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,7 @@ import { LayoutComponent } from './layout.component';
 import { ListComponent } from './list.component';
 import { AddEditComponent } from './add-edit.component';
 import { DetailsComponent } from './details.component';
+import { TransferComponent } from './transfer.component';
 
 @NgModule({
     imports: [
@@ -19,7 +20,8 @@ import { DetailsComponent } from './details.component';
         LayoutComponent,
         ListComponent,
         AddEditComponent,
-        DetailsComponent
+        DetailsComponent,
+        TransferComponent
     ]
 })
 export class EmployeesModule { }

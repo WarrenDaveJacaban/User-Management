@@ -23,7 +23,9 @@ export class EmployeeService {
     create(employee: Employee): Observable<Employee> {
         return this.http.post<Employee>(baseUrl, employee);
     }
-
+    transferEmployee(id: string, departmentId: number): Observable<any> {
+    return this.http.post<any>(`${baseUrl}/${id}/transfer`, { departmentId });
+}
     update(id: string, employee: Employee): Observable<Employee> {
         return this.http.put<Employee>(`${baseUrl}/${id}`, employee);
     }
