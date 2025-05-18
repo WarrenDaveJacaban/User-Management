@@ -1,0 +1,285 @@
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-0" *ngIf="request">Request: {{ request.requestNumber }}</h1>
+            <p class="text-muted">View request details and status</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a routerLink="/requests/my-requests" class="btn btn-light me-2">
+                <i class="fas fa-arrow-left me-1"></i> Back
+            </a>
+            <a [routerLink]="['/requests/edit', id]" class="btn btn-primary me-2" *ngIf="canEdit">
+                <i class="fas fa-edit me-1"></i> Edit
+            </a>
+            <button class="btn btn-danger" *ngIf="canDelete" (click)="deleteRequest()">
+                <i class="fas fa-trash me-1"></i> Delete
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="text-center p-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 mb-0">Loading request details...</p>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+    </div>
+
+    <div *ngIf="request && !loading" class="row">
+        <div class="col-lg-8">
+            <!-- Request details -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Request Information</h5>
+                    <span class="badge" [ngClass]="{
+                        'bg-warning text-dark': request.status === 'Pending',
+                        'bg-info text-white': request.status === 'In Progress',
+                        'bg-success': request.status === 'Approved' || request.status === 'Completed',
+                        'bg-danger': request.status === 'Rejected'
+                    }">
+                        {{ request.status }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Request Details</h6>
+                            <table class="table table-borderless table-sm">
+                                <tr>
+                                    <td><strong>Request Number:</strong></td>
+                                    <td>{{ request.requestNumber }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Type:</strong></td>
+                                    <td>
+                                        <span class="badge text-white" [ngClass]="{
+                                            'bg-primary': request.type === 'Equipment',
+                                            'bg-info': request.type === 'Leave',
+                                            'bg-success': request.type === 'Resource',
+                                            'bg-secondary': request.type === 'Other'
+                                        }">
+                                            {{ request.type }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Title:</strong></td>
+                                    <td>{{ request.title }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Description:</strong></td>
+                                    <td>{{ request.description || 'No description provided' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date Submitted:</strong></td>
+                                    <td>{{ request.created | date:'medium' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Requestor Information</h6>
+                            <table class="table table-borderless table-sm">
+                                <tr>
+                                    <td><strong>Requestor:</strong></td>
+                                    <td>{{ request.requestorName }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{ request.requestorEmail }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Department:</strong></td>
+                                    <td>{{ request.departmentName || 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Assigned To:</strong></td>
+                                    <td>{{ request.assignedToName || 'Not Assigned' }}</td>
+                                </tr>
+                                <tr *ngIf="request.status === 'Completed'">
+                                    <td><strong>Completed By:</strong></td>
+                                    <td>{{ request.completedByName }}</td>
+                                </tr>
+                                <tr *ngIf="request.status === 'Completed'">
+                                    <td><strong>Completion Date:</strong></td>
+                                    <td>{{ request.completedAt | date:'medium' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Status update form for admins only -->
+                    <div *ngIf="isAdmin" class="mt-4 pt-4 border-top">
+                        <h6 class="mb-3">Update Request Status</h6>
+                        <form [formGroup]="statusForm" (ngSubmit)="updateStatus()" class="row align-items-end">
+                            <div class="col-md-8">
+                                <div class="form-group mb-0">
+                                    <label class="form-label">Status</label>
+                                    <select formControlName="status" class="form-select">
+                                        <option value="Pending">Pending</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Rejected">Rejected</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-0">
+                                    <button type="submit" class="btn btn-primary w-100" [disabled]="updatingStatus || statusForm.invalid">
+                                        <span *ngIf="updatingStatus" class="spinner-border spinner-border-sm me-1"></span>
+                                        Update Status
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request items -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Request Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of request.items; let i = index">
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.description || 'No description provided' }}</td>
+                                </tr>
+                                <tr *ngIf="!request.items || request.items.length === 0">
+                                    <td colspan="4" class="text-center p-3">
+                                        <p class="mb-0">No items found in this request</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Status timeline -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Status Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="timeline">
+                        <li class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Request Created</h6>
+                                <p class="small text-muted mb-0">{{ request.created | date:'medium' }}</p>
+                                <p class="mb-0">Request submitted by {{ request.requestorName }}</p>
+                            </div>
+                        </li>
+                        
+                        <li class="timeline-item" *ngIf="request.status !== 'Pending'">
+                            <div class="timeline-marker" [ngClass]="{
+                                'bg-info': request.status === 'In Progress',
+                                'bg-success': request.status === 'Approved' || request.status === 'Completed',
+                                'bg-danger': request.status === 'Rejected'
+                            }"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Status Updated</h6>
+                                <p class="small text-muted mb-0">{{ request.updated | date:'medium' }}</p>
+                                <p class="mb-0">Status changed to <strong>{{ request.status }}</strong></p>
+                            </div>
+                        </li>
+                        
+                        <li class="timeline-item" *ngIf="request.status === 'Completed'">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Request Completed</h6>
+                                <p class="small text-muted mb-0">{{ request.completedAt | date:'medium' }}</p>
+                                <p class="mb-0">Completed by {{ request.completedByName }}</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Quick actions -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a [routerLink]="['/requests/edit', id]" class="btn btn-outline-primary" *ngIf="canEdit">
+                            <i class="fas fa-edit me-1"></i> Edit Request
+                        </a>
+                        <button class="btn btn-outline-danger" *ngIf="canDelete" (click)="deleteRequest()">
+                            <i class="fas fa-trash me-1"></i> Delete Request
+                        </button>
+                        <a routerLink="/requests/my-requests" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-1"></i> View My Requests
+                        </a>
+                        <a routerLink="/requests/add" class="btn btn-outline-success">
+                            <i class="fas fa-plus-circle me-1"></i> Create New Request
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Timeline styling */
+    .timeline {
+        list-style: none;
+        padding: 0;
+        position: relative;
+    }
+    
+    .timeline:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 12px;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 40px;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #ddd;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 2px #e9ecef;
+    }
+    
+    .timeline-content {
+        padding: 0 0 0 15px;
+    }
+</style>

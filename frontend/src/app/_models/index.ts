@@ -5,3 +5,4 @@ export * from './alert';
 export * from './department';
 export * from './employee';
 export * from './workflow';
+export * from './request';

@@ -1,0 +1,136 @@
+<!-- frontend/src/app/requests/add-edit.component.html -->
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-0">{{ isAddMode ? 'Create Request' : 'Edit Request' }}</h1>
+            <p class="text-muted">{{ isAddMode ? 'Submit a new request' : 'Modify your existing request' }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a routerLink="/requests/my-requests" class="btn btn-light">
+                <i class="fas fa-arrow-left me-1"></i> Back to My Requests
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="text-center p-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 mb-0">Loading request data...</p>
+    </div>
+
+    <div *ngIf="!loading">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Request Details</h5>
+            </div>
+            <div class="card-body">
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Request Type</label>
+                                <select formControlName="type" class="form-select" 
+                                    [ngClass]="{ 'is-invalid': f.type.errors && f.type.touched }">
+                                    <option value="Equipment">Equipment</option>
+                                    <option value="Leave">Leave</option>
+                                    <option value="Resource">Resource</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div *ngIf="f.type.errors && f.type.touched" class="invalid-feedback">
+                                    <div *ngIf="f.type.errors.required">Request type is required</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Request Title</label>
+                                <input type="text" formControlName="title" class="form-control" 
+                                    [ngClass]="{ 'is-invalid': f.title.errors && f.title.touched }" 
+                                    placeholder="Enter a descriptive title">
+                                <div *ngIf="f.title.errors && f.title.touched" class="invalid-feedback">
+                                    <div *ngIf="f.title.errors.required">Title is required</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label">Description (Optional)</label>
+                        <textarea formControlName="description" class="form-control" rows="3" 
+                            placeholder="Provide additional details about this request"></textarea>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Request Items</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addItem()">
+                                <i class="fas fa-plus me-1"></i> Add Item
+                            </button>
+                        </div>
+
+                        <div *ngIf="items.controls.length === 0" class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            At least one item is required. Click "Add Item" to add an item to this request.
+                        </div>
+
+                        <div formArrayName="items" class="mt-3">
+                            <div *ngFor="let itemForm of items.controls; let i = index" 
+                                 [formGroupName]="i" class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Item #{{ i + 1 }}</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeItem(i)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Item Name</label>
+                                            <input type="text" formControlName="name" class="form-control" 
+                                                [ngClass]="{ 'is-invalid': itemForm.get('name').errors && itemForm.get('name').touched }" 
+                                                placeholder="Enter item name">
+                                            <div *ngIf="itemForm.get('name').errors && itemForm.get('name').touched" class="invalid-feedback">
+                                                <div *ngIf="itemForm.get('name').errors.required">Item name is required</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Quantity</label>
+                                            <input type="number" formControlName="quantity" class="form-control" 
+                                                [ngClass]="{ 'is-invalid': itemForm.get('quantity').errors && itemForm.get('quantity').touched }" 
+                                                min="1" step="1">
+                                            <div *ngIf="itemForm.get('quantity').errors && itemForm.get('quantity').touched" class="invalid-feedback">
+                                                <div *ngIf="itemForm.get('quantity').errors.required">Quantity is required</div>
+                                                <div *ngIf="itemForm.get('quantity').errors.min">Quantity must be at least 1</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Description (Optional)</label>
+                                            <textarea formControlName="description" class="form-control" rows="2" 
+                                                placeholder="Additional details about this item"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-light" routerLink="/requests/my-requests">
+                            <i class="fas fa-times me-1"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" [disabled]="submitting || form.invalid">
+                            <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+                            <i *ngIf="!submitting" class="fas fa-save me-1"></i>
+                            {{ isAddMode ? 'Submit Request' : 'Update Request' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
