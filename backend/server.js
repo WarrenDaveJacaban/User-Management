@@ -80,6 +80,9 @@ try {
     app.use('/accounts', accountsController);
     
     // New controllers
+    const requestsController = require('./requests/requests.controller');
+app.use('/requests', requestsController);
+
     const departmentsController = require('./departments/departments.controller');
     app.use('/departments', departmentsController);
     

@@ -32,7 +32,8 @@ async function initialize() {
         db.Department = require('../departments/department.model')(sequelize);
         db.Employee = require('../employees/employee.model')(sequelize);
         db.Workflow = require('../workflows/workflow.model')(sequelize);
-        
+        db.Request = require('../requests/request.model')(sequelize);
+db.RequestItem = require('../requests/request-item.model')(sequelize);
         // Setup relationships
         db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
         db.RefreshToken.belongsTo(db.Account);
@@ -54,6 +55,24 @@ async function initialize() {
         db.Workflow.belongsTo(db.Account, { foreignKey: 'assignedTo', as: 'AssignedTo' });
         db.Workflow.belongsTo(db.Account, { foreignKey: 'completedBy', as: 'CompletedBy' });
 
+        // Add these relationships after the other relationships
+db.Account.hasMany(db.Request, { foreignKey: 'accountId' });
+db.Request.belongsTo(db.Account, { foreignKey: 'accountId' });
+
+db.Employee.hasMany(db.Request, { foreignKey: 'employeeId' });
+db.Request.belongsTo(db.Employee, { foreignKey: 'employeeId' });
+
+db.Account.hasMany(db.Request, { foreignKey: 'assignedTo', as: 'AssignedRequests' });
+db.Request.belongsTo(db.Account, { foreignKey: 'assignedTo', as: 'AssignedTo' });
+
+db.Account.hasMany(db.Request, { foreignKey: 'completedBy', as: 'CompletedRequests' });
+db.Request.belongsTo(db.Account, { foreignKey: 'completedBy', as: 'CompletedBy' });
+// Request Items relationship
+db.Request.hasMany(db.RequestItem, { 
+    foreignKey: 'requestId',
+    onDelete: 'CASCADE'
+});
+db.RequestItem.belongsTo(db.Request, { foreignKey: 'requestId' });
         // Sync models
         await sequelize.authenticate();
         await sequelize.sync({ alter: true });
