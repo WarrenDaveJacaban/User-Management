@@ -1,0 +1,100 @@
+<div class="container-fluid p-0">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-0">My Requests</h1>
+            <p class="text-muted">View and manage your submitted requests</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a routerLink="/requests" class="btn btn-outline-primary me-2">
+                <i class="fas fa-list me-1"></i> All Requests
+            </a>
+            <a routerLink="/requests/add" class="btn btn-success">
+                <i class="fas fa-plus-circle me-1"></i> New Request
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">My Submitted Requests</h5>
+        </div>
+        <div class="card-body p-0">
+            <!-- Loading spinner -->
+            <div *ngIf="loading" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 mb-0">Loading your requests...</p>
+            </div>
+
+            <!-- Error message -->
+            <div *ngIf="error" class="alert alert-danger m-3">
+                {{ error }}
+            </div>
+
+            <!-- Requests table -->
+            <div *ngIf="!loading && !error" class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Request #</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Assigned To</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let request of requests">
+                            <td>{{ request.requestNumber }}</td>
+                            <td>{{ request.title }}</td>
+                            <td>
+                                <span class="badge text-white" [ngClass]="{
+                                    'bg-primary': request.type === 'Equipment',
+                                    'bg-info': request.type === 'Leave',
+                                    'bg-success': request.type === 'Resource',
+                                    'bg-secondary': request.type === 'Other'
+                                }">
+                                    {{ request.type }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                                    'bg-warning text-dark': request.status === 'Pending',
+                                    'bg-info text-white': request.status === 'In Progress',
+                                    'bg-success': request.status === 'Approved' || request.status === 'Completed',
+                                    'bg-danger': request.status === 'Rejected'
+                                }">
+                                    {{ request.status }}
+                                </span>
+                            </td>
+                            <td>{{ request.created | date:'short' }}</td>
+                            <td>{{ request.assignedToName || 'Not Assigned' }}</td>
+                            <td class="text-end">
+                                <a [routerLink]="['/requests/details', request.id]" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a [routerLink]="['/requests/edit', request.id]" class="btn btn-sm btn-outline-primary me-1" *ngIf="request.status === 'Pending'">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button (click)="deleteRequest(request.id)" class="btn btn-sm btn-outline-danger" *ngIf="request.status === 'Pending'">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="requests.length === 0">
+                            <td colspan="7" class="text-center p-3">
+                                <p class="mb-0">You haven't submitted any requests yet</p>
+                                <small class="text-muted">
+                                    <a routerLink="/requests/add" class="text-primary">Create a new request</a> to get started
+                                </small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
